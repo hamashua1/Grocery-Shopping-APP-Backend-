@@ -28,7 +28,15 @@ router.post('/api/items', async(req,res)=>{
 })
 
 
-//route for PATCH endpoints
+//route for delete endpoints
+router.delete('/api/items/:id', async (req,res)=>{
+    try{
+    const results = await itemModel.findByIdAndDelete(req.params.id)
+    res.status(200).json({message:'deleted successfully', results})
+    }catch(err){
+        res.status(500).json({message:'item couldnt be deleted' })
+    }
+})
 
 export default router
 
