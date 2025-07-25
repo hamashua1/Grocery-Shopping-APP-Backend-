@@ -38,5 +38,69 @@ router.delete('/api/items/:id', async (req,res)=>{
     }
 })
 
+
+//route for delete endpoints
+router.delete('/api/items/category/:id', async (req,res)=>{
+    try{
+    const results = await itemModel.findByIdAndDelete(req.params.id)
+    res.status(200).json({message:'deleted successfully', results})
+    }catch(err){
+        res.status(500).json({message:'category couldnt be deleted' })
+    }
+})
+
+
+
+//route for get endpoints
+router.get('/api/categories', async(req,res)=> {
+try{
+    const results = await itemModel.find()
+    res.status(200).json(results)
+}catch(err){
+    res.status(404).json({message:'couldnt retrieve category'})
+}
+})
+
+
+//route for get fruits
+router.get('/api/category/Fruits', async(req,res)=>{
+    try{
+    const results= await itemModel.find()
+    res.status(200).json(results)
+    }catch(err){
+        res.status(404).json({message:'fruits not found'})
+    }
+})
+
+//route for get vegetables
+router.get('/api/category/Vegetables', async(req,res)=>{
+    try{
+    const results= await itemModel.find()
+    res.status(200).json(results)
+    }catch(err){
+        res.status(404).json({message:'vegetables not found'})
+    }
+})
+
+//route for get meat
+router.get('/api/category/Meat', async(req,res)=>{
+    try{
+    const results= await itemModel.find()
+    res.status(200).json(results)
+    }catch(err){
+        res.status(404).json({message:'meat not found'})
+    }
+})
+
+//route for get drinks
+router.get('/api/category/Drinks', async(req,res)=>{
+    try{
+    const results= await itemModel.find()
+    res.status(200).json(results)
+    }catch(err){
+        res.status(404).json({message:'meat not found'})
+    }
+})
+
 export default router
 
