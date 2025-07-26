@@ -1,7 +1,7 @@
 import itemModel from '../schema/item.js'
 
 
-getItems = async (req,res)=>{
+export const getItems = async (req,res)=>{
     try{
          const results = await itemModel.find()
          res.status(200).json(results)
@@ -10,7 +10,7 @@ getItems = async (req,res)=>{
     }
     }
 
-postItems = async(req,res)=>{
+export const postItems = async(req,res)=>{
      try{
      const {name , category , completed} =req.body
      const item = new itemModel ({name, category, completed})
@@ -21,7 +21,7 @@ postItems = async(req,res)=>{
      }
  }
 
- deleteItems = async (req,res)=>{
+ export const deleteItems = async (req,res)=>{
      try{
      const results = await itemModel.findByIdAndDelete(req.params.id)
      res.status(200).json({message:'deleted successfully', results})
@@ -29,7 +29,7 @@ postItems = async(req,res)=>{
          res.status(500).json({message:'item couldnt be deleted' })
      }
  }
- deleteCategory = async (req,res)=>{
+ export const deleteCategory = async (req,res)=>{
      try{
      const results = await itemModel.findByIdAndDelete(req.params.id)
      res.status(200).json({message:'deleted successfully', results})
@@ -37,7 +37,7 @@ postItems = async(req,res)=>{
          res.status(500).json({message:'category couldnt be deleted' })
      }
  }
- getCategory = async(req,res)=> {
+ export const getCategory = async(req,res)=> {
      try{
          const results = await itemModel.find()
          res.status(200).json(results)
@@ -45,7 +45,7 @@ postItems = async(req,res)=>{
          res.status(404).json({message:'couldnt retrieve category'})
      }
      }
-getFruits = async(req,res)=>{
+export const getFruits = async(req,res)=>{
           try{
           const results= await itemModel.find()
           res.status(200).json(results)
@@ -53,7 +53,7 @@ getFruits = async(req,res)=>{
               res.status(404).json({message:'fruits not found'})
           }
       }   
-getVegetables = async(req,res)=>{
+export const getVegetables = async(req,res)=>{
      try{
      const results= await itemModel.find()
      res.status(200).json(results)
@@ -61,7 +61,7 @@ getVegetables = async(req,res)=>{
          res.status(404).json({message:'vegetables not found'})
      }
  }      
-getMeat = async(req,res)=>{
+export const getMeat = async(req,res)=>{
      try{
      const results= await itemModel.find()
      res.status(200).json(results)
@@ -70,7 +70,7 @@ getMeat = async(req,res)=>{
      }
  }
 
- getDrinks = async(req,res)=>{
+ export const getDrinks = async(req,res)=>{
      try{
      const results= await itemModel.find()
      res.status(200).json(results)
