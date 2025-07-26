@@ -1,6 +1,7 @@
 import itemModel from '../schema/item.js'
 
 
+
 export const getItems = async (req,res)=>{
     try{
          const results = await itemModel.find()
@@ -17,7 +18,7 @@ export const postItems = async(req,res)=>{
      await item.save()
      res.status(201).json({message:"item added succesfully", item})
      }catch(err){
-         res.status(401).json({message:"items not added to database "})
+         res.status(400).json({message:"items not added to database "})
      }
  }
 
@@ -39,12 +40,15 @@ export const postItems = async(req,res)=>{
  }
  export const getCategory = async(req,res)=> {
      try{
-         const results = await itemModel.find()
+          const {category} = req.params
+         const results = await itemModel.find({category:category})
          res.status(200).json(results)
      }catch(err){
          res.status(404).json({message:'couldnt retrieve category'})
      }
      }
+
+    
 export const getFruits = async(req,res)=>{
           try{
           const results= await itemModel.find({category: 'Fruits'})
