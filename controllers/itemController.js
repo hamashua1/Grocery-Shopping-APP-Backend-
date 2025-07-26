@@ -40,8 +40,7 @@ export const postItems = async(req,res)=>{
  }
  export const getCategory = async(req,res)=> {
      try{
-          const {category} = req.params
-         const results = await itemModel.find({category:category})
+         const results = await itemModel.distinct('category')
          res.status(200).json(results)
      }catch(err){
          res.status(404).json({message:'couldnt retrieve category'})
