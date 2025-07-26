@@ -4,10 +4,10 @@ const router = express.Router()
 
 
 
-//post ebdpoint to register 
+//post endpoints
 
 router.post('/api/login/register', postLogin)
-
+router.post('/api/login/signIn',postSignIn )
 
 
 
