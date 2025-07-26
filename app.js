@@ -9,13 +9,13 @@ const app = express()
 connectDB()
 app.use(cors())
 app.use(cookieParser())
-const port = process.env.port || 8000
+const PORT = process.env.PORT || 8000
 app.use(express.json())
 
 // Use routes
 app.use(itemRoutes)
 
 
-app.listen(port, ()=> {
-    console.log(`server is flying on port ${port}`)
+app.listen(PORT, ()=> {
+    console.log(`server is flying on port ${PORT}`)
 })

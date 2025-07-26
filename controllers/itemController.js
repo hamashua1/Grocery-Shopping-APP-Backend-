@@ -47,7 +47,7 @@ export const postItems = async(req,res)=>{
      }
 export const getFruits = async(req,res)=>{
           try{
-          const results= await itemModel.find()
+          const results= await itemModel.find({category: 'Fruits'})
           res.status(200).json(results)
           }catch(err){
               res.status(404).json({message:'fruits not found'})
@@ -55,7 +55,7 @@ export const getFruits = async(req,res)=>{
       }   
 export const getVegetables = async(req,res)=>{
      try{
-     const results= await itemModel.find()
+     const results= await itemModel.find({category: 'Vegetables'})
      res.status(200).json(results)
      }catch(err){
          res.status(404).json({message:'vegetables not found'})
@@ -63,7 +63,7 @@ export const getVegetables = async(req,res)=>{
  }      
 export const getMeat = async(req,res)=>{
      try{
-     const results= await itemModel.find()
+     const results= await itemModel.find({category: 'Meat'})
      res.status(200).json(results)
      }catch(err){
          res.status(404).json({message:'meat not found'})
@@ -72,7 +72,7 @@ export const getMeat = async(req,res)=>{
 
  export const getDrinks = async(req,res)=>{
      try{
-     const results= await itemModel.find()
+     const results= await itemModel.find({category: 'Drinks'})
      res.status(200).json(results)
      }catch(err){
          res.status(404).json({message:'drinks not found'})
