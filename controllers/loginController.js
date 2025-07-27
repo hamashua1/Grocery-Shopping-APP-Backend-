@@ -11,6 +11,12 @@ export const postLogin = async(req,res)=>{
     const hashedPassword = await bcrypt.hash(password, 10)
     const results = new loginModel({name,email,password: hashedPassword})
     await results.save()
+    const token = jwt.sign({id: results._id}, process.env.JWT_SECRET, {expiresIn :'1hr'})
+    res.cookie('token', token , 
+    {httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict', 
+    maxAge: 60 * 60 * 1000})
     res.status(201).json({message: 'info added to database', results})
     }catch(err){
         res.status(400).json({message : "couldnt add to database"})
