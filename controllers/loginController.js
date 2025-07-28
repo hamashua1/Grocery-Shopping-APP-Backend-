@@ -24,7 +24,8 @@ export const postSignIn =  async(req,res)=>{
       const results = await loginModel.findOne({email})
       if(!results){
         return res.status(404).json({message:"email not found"})
-    }
+      }  
+      
       const isPasswordCorrect = await bcrypt.compare(password, results.password)
 
       if(!isPasswordCorrect){
@@ -36,8 +37,8 @@ export const postSignIn =  async(req,res)=>{
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict', 
       maxAge: 60 * 60 * 1000})
-      res.status(200).json({message: 'sign in successful', results})
-      }
+      res.status(200).json({message: 'sign in successful', results , isPasswordCorrect})
+    }
     catch(err){
         res.status(500).json({message: "sign in failed"})
     }
