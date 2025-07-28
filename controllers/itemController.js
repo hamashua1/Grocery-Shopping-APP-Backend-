@@ -1,4 +1,4 @@
-import itemModel from '../schema/item.js'
+import itemModel from '../Models/item.js'
 
 
 
