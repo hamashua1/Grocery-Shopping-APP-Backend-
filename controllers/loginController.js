@@ -1,5 +1,4 @@
 import loginModel from '../Models/login.js'
-import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
 export const postLogin = async(req,res)=>{
