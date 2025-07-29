@@ -5,8 +5,9 @@ import jwt from 'jsonwebtoken'
 export const postLogin = async(req,res)=>{
     try{
     const {name , email, password } = req.body
-    // Remove manual hashing - it's now handled by the model's pre-save middleware
-    const results = new loginModel({name,email,password})
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(password, salt)
+    const results = new loginModel({name, email, password: hashedPassword})
     await results.save()
     res.status(201).json({message: 'info added to database', results})
     }catch(err){

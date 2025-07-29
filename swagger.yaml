@@ -1,0 +1,635 @@
+openapi: 3.0.3
+info:
+  title: Grocery Shopping App Backend API
+  description: |
+    Backend API for a Grocery Shopping application that allows users to manage grocery items, 
+    handle user authentication, and reset passwords via email.
+    
+    **Features:**
+    - User registration and authentication
+    - Grocery item management (CRUD operations)
+    - Category-based item filtering
+    - Password reset via email
+    - JWT-based authentication with cookies
+  version: 1.0.0
+  contact:
+    name: Joshua Nun
+    url: https://github.com/hamashua1/Grocery-Shopping-APP-Backend-
+  license:
+    name: ISC
+
+servers:
+  - url: http://localhost:8000
+    description: Development server
+  - url: https://your-production-domain.com
+    description: Production server
+
+paths:
+  # Authentication Endpoints
+  /api/login/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Create a new user account with name, email, and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+              properties:
+                name:
+                  type: string
+                  example: "John Doe"
+                email:
+                  type: string
+                  format: email
+                  example: "john.doe@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "securePassword123"
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "info added to database"
+                  results:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Registration failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "couldnt add to database"
+
+  /api/login/signIn:
+    post:
+      tags:
+        - Authentication
+      summary: Sign in user
+      description: Authenticate user with email and password, returns JWT token in cookie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "john.doe@example.com"
+                password:
+                  type: string
+                  format: password
+                  example: "securePassword123"
+      responses:
+        '200':
+          description: Sign in successful
+          headers:
+            Set-Cookie:
+              description: JWT token cookie
+              schema:
+                type: string
+                example: "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...; HttpOnly; Secure; SameSite=None; Max-Age=3600"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "sign in successful"
+                  results:
+                    $ref: '#/components/schemas/User'
+                  isPasswordCorrect:
+                    type: boolean
+                    example: true
+        '404':
+          description: Email not found or password mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                email_not_found:
+                  value:
+                    message: "email not found"
+                password_mismatch:
+                  value:
+                    message: "password mismatch"
+        '500':
+          description: Sign in failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "sign in failed"
+
+  /api/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout user
+      description: Destroy user session and clear authentication cookie
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "logout successfully"
+        '500':
+          description: Logout failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "logout failed"
+
+  # Password Reset Endpoints
+  /api/auth/request-reset:
+    post:
+      tags:
+        - Password Reset
+      summary: Request password reset
+      description: Send password reset email to user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "john.doe@example.com"
+      responses:
+        '200':
+          description: Password reset email sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "password resent sent"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "user not found"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "server error"
+
+  /api/auth/reset-password:
+    post:
+      tags:
+        - Password Reset
+      summary: Reset password
+      description: Reset user password using reset token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - newPassword
+              properties:
+                newPassword:
+                  type: string
+                  format: password
+                  example: "newSecurePassword123"
+      parameters:
+        - name: token
+          in: path
+          required: true
+          description: Password reset token from email
+          schema:
+            type: string
+            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+      responses:
+        '200':
+          description: Password reset successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "new password saved succesfully"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "user not found"
+        '400':
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "invalid token"
+
+  # Item Management Endpoints
+  /api/items:
+    get:
+      tags:
+        - Items
+      summary: Get all grocery items
+      description: Retrieve all grocery items from the database
+      responses:
+        '200':
+          description: Items retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+        '404':
+          description: Couldn't fetch response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "couldn't fetch response"
+    
+    post:
+      tags:
+        - Items
+      summary: Add a new grocery item
+      description: Create a new grocery item in the database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - category
+                - completed
+              properties:
+                name:
+                  type: string
+                  example: "Apples"
+                category:
+                  type: string
+                  enum: [Fruits, Vegetables, Meat, Drinks]
+                  example: "Fruits"
+                completed:
+                  type: boolean
+                  example: false
+      responses:
+        '201':
+          description: Item added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "item added succesfully"
+                  item:
+                    $ref: '#/components/schemas/Item'
+        '400':
+          description: Items not added to database
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "items not added to database"
+
+  /api/items/{id}:
+    delete:
+      tags:
+        - Items
+      summary: Delete a grocery item
+      description: Delete a specific grocery item by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Item ID to delete
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439011"
+      responses:
+        '200':
+          description: Item deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "deleted successfully"
+                  results:
+                    $ref: '#/components/schemas/Item'
+        '500':
+          description: Item couldn't be deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "item couldnt be deleted"
+
+  /api/items/category/{id}:
+    delete:
+      tags:
+        - Items
+      summary: Delete a category
+      description: Delete a specific category by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category ID to delete
+          schema:
+            type: string
+            example: "507f1f77bcf86cd799439011"
+      responses:
+        '200':
+          description: Category deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "deleted successfully"
+                  results:
+                    $ref: '#/components/schemas/Item'
+        '500':
+          description: Category couldn't be deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "category couldnt be deleted"
+
+  # Category Endpoints
+  /api/categories:
+    get:
+      tags:
+        - Categories
+      summary: Get all categories
+      description: Retrieve all distinct categories from items
+      responses:
+        '200':
+          description: Categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example: ["Fruits", "Vegetables", "Meat", "Drinks"]
+        '404':
+          description: Couldn't retrieve category
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "couldnt retrieve category"
+
+  /api/category/Fruits:
+    get:
+      tags:
+        - Categories
+      summary: Get fruit items
+      description: Retrieve all items in the Fruits category
+      responses:
+        '200':
+          description: Fruit items retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+        '404':
+          description: Fruits not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "fruits not found"
+
+  /api/category/Vegetables:
+    get:
+      tags:
+        - Categories
+      summary: Get vegetable items
+      description: Retrieve all items in the Vegetables category
+      responses:
+        '200':
+          description: Vegetable items retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+        '404':
+          description: Vegetables not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "vegetables not found"
+
+  /api/category/Meat:
+    get:
+      tags:
+        - Categories
+      summary: Get meat items
+      description: Retrieve all items in the Meat category
+      responses:
+        '200':
+          description: Meat items retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+        '404':
+          description: Meat not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "meat not found"
+
+  /api/category/Drinks:
+    get:
+      tags:
+        - Categories
+      summary: Get drink items
+      description: Retrieve all items in the Drinks category
+      responses:
+        '200':
+          description: Drink items retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+        '404':
+          description: Drinks not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                message: "drinks not found"
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          example: "john.doe@example.com"
+        password:
+          type: string
+          description: "Hashed password (not returned in responses)"
+        verifyOtp:
+          type: string
+          default: ""
+        verifyOtpExpireAt:
+          type: number
+          default: 0
+        isAccountVerified:
+          type: boolean
+          default: false
+        resetOtp:
+          type: string
+          default: ""
+        resetOtpExpireAt:
+          type: number
+          default: 0
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-01-01T00:00:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2024-01-01T00:00:00.000Z"
+
+    Item:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "507f1f77bcf86cd799439011"
+        name:
+          type: string
+          example: "Apples"
+        category:
+          type: string
+          enum: [Fruits, Vegetables, Meat, Drinks]
+          example: "Fruits"
+        completed:
+          type: boolean
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-01-01T00:00:00.000Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2024-01-01T00:00:00.000Z"
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Error message description"
+
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: token
+      description: JWT token stored in HTTP-only cookie
+
+security:
+  - cookieAuth: []
+
+tags:
+  - name: Authentication
+    description: User registration, login, and logout operations
+  - name: Password Reset
+    description: Password reset functionality via email
+  - name: Items
+    description: Grocery item management operations
+  - name: Categories
+    description: Category-based item filtering operations 

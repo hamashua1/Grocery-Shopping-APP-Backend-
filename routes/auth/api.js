@@ -1,4 +1,5 @@
 import express from 'express'
+import { postLogin, postSignIn, postLogout } from '../../controllers/loginController.js'
 const router = express.Router()
 
 //endpoints
