@@ -43,7 +43,7 @@ export const postSignIn =  async(req,res)=>{
 export const postLogout = async (req ,res)=>{
     req.session.destroy(err => {
     if (err) return res.status(500).json({message: 'logout failed'})
-    res.ClearCookie('token')
+    res.clearCookie('token')
         res.status(200).json({message: 'logout successfully'})
     })
 }

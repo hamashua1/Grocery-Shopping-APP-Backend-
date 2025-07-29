@@ -10,15 +10,25 @@ import authRoutes from './routes/auth/api.js'
 import emailRoutes from './routes/email/api.js'
 
 const app = express()
-connectDB()
+
+// Configure CORS to allow credentials and specific origins
+app.use(cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Add your frontend URL
+    credentials: true, // Allow cookies
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
+}))
+
+app.use(cookieParser())
+app.use(express.json())
+
+// Connect to database with error handling
+connectDB().catch(console.error)
 
 // Load Swagger documentation
 const swaggerDocument = YAML.load('./swagger.yaml')
 
-app.use(cors())
-app.use(cookieParser())
 const PORT = process.env.PORT || 8000
-app.use(express.json())
 
 // Swagger documentation route
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
