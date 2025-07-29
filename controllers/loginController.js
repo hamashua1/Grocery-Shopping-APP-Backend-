@@ -2,14 +2,11 @@ import loginModel from '../Models/login.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
-
-
-
 export const postLogin = async(req,res)=>{
     try{
     const {name , email, password } = req.body
-    const hashedPassword = await bcrypt.hash(password, 10)
-    const results = new loginModel({name,email,password: hashedPassword})
+    // Remove manual hashing - it's now handled by the model's pre-save middleware
+    const results = new loginModel({name,email,password})
     await results.save()
     res.status(201).json({message: 'info added to database', results})
     }catch(err){
@@ -26,12 +23,13 @@ export const postSignIn =  async(req,res)=>{
         return res.status(404).json({message:"email not found"})
       }  
       
-      const isPasswordCorrect = await bcrypt.compare(password, results.password)
+      // Use the model's comparePassword method instead of manual bcrypt.compare
+      const isPasswordCorrect = await results.comparePassword(password)
 
       if(!isPasswordCorrect){
         return res.status(404).json({message : 'password mismatch'})
       }  
-      const token = jwt.sign({id: results._id}, process.env.JWT_SECRET, {expiresIn :'1hr'})
+      const token = jwt.sign({id: results._id}, process.env.JWT_SECRET, {expiresIn :'1h'})
       res.cookie('token', token , 
       {httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

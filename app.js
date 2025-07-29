@@ -4,7 +4,8 @@ import cookieParser from "cookie-parser"
 import 'dotenv/config'
 import connectDB from './database/mongodb.js'
 import itemRoutes from './routes/item/api.js'
-import loginRoutes from './routes/auth/api.js'
+import authRoutes from './routes/auth/api.js'
+import emailRoutes from './routes/email/api.js'
 
 const app = express()
 connectDB()
@@ -15,9 +16,12 @@ app.use(express.json())
 
 // Use routes
 app.use(itemRoutes)
-app.use(loginRoutes)
+app.use(authRoutes)
+app.use(emailRoutes)
 
 
 app.listen(PORT, ()=> {
     console.log(`server is flying on port ${PORT}`)
 })
+
+
