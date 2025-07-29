@@ -27,7 +27,7 @@ export const resetPassword = async (req,res)=>{
         await results.save()
         res.status(200).json({message : 'new password saved succesfully'})
 }catch(err){
-    res.staus(400).json({message : 'invalid token '})
+    res.status(400).json({message : 'invalid token '})
 }
 }
 

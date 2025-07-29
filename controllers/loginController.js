@@ -5,9 +5,7 @@ import jwt from 'jsonwebtoken'
 export const postLogin = async(req,res)=>{
     try{
     const {name , email, password } = req.body
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(password, salt)
-    const results = new loginModel({name, email, password: hashedPassword})
+    const results = new loginModel({name, email, password})
     await results.save()
     res.status(201).json({message: 'info added to database', results})
     }catch(err){
