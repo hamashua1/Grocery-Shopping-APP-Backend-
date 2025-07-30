@@ -7,16 +7,15 @@ export const postLogin = async(req,res)=>{
     const {name , email, password } = req.body
     const results = new loginModel({name, email, password})
     await results.save()
-    res.status(201).json({message: 'info added to database', results})
-
-    const mail = {
+  
+      const mail = {
       from : process.env.SENDER_EMAIL,
       to : email,
       subject: 'welcome to our grocesory shopping app',
       text : `welcome to our shopping app for a good experience, you have successfully created an account with email id: ${email}`
     }
     await transporter.sendMail(mail)
-    res.json({message : 'registration email sent successfully', mail})
+    res.status(201).json({message: 'info added to database', results,mail})
     }catch(err){
         res.status(400).json({message : "couldnt add to database"})
     }
