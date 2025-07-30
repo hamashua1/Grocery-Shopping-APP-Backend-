@@ -1,5 +1,6 @@
 import loginModel from '../Models/login.js'
 import jwt from 'jsonwebtoken'
+import transporter from '../services/emailService.js'
 
 export const postLogin = async(req,res)=>{
     try{
@@ -7,6 +8,14 @@ export const postLogin = async(req,res)=>{
     const results = new loginModel({name, email, password})
     await results.save()
     res.status(201).json({message: 'info added to database', results})
+
+    const mail = {
+      from : process.env.SENDER_EMAIL,
+      to : email,
+      subject: 'welcome to our grocesory shopping app',
+      text : `welcome to our shopping app for a good experience, you have successfully created an account with email id: ${email}`
+    }
+    await transporter.sendMail(mail)
     }catch(err){
         res.status(400).json({message : "couldnt add to database"})
     }
