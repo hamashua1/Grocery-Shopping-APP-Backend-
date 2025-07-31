@@ -55,7 +55,7 @@ app.use(emailRoutes)
 
 
 app.listen(PORT, ()=> {
-    console.log(`server is flying on port ${PORT}`)
+    console.log(`server is flying 🛩️  on port ${PORT}`)
 })
 
 
