@@ -49,8 +49,9 @@ export const requestPasswordReset = async (req, res) => {
      }
 
      const results = await loginModel.findOne({ email })
-     if (!results) return res.status(404).json({ message: 'User not found with this email address' })
-     
+     if (!results) {
+      return res.status(404).json({ message: 'User not found with this email address' })
+     }
      const token = jwt.sign({ id: results._id }, process.env.JWT_RESET_SECRET, { expiresIn: '1h' })
      await sendResetEmail(email, token)
      res.status(200).json({ message: 'Password reset email sent successfully. Please check your inbox.' })
@@ -75,8 +76,9 @@ export const resetPassword = async (req, res) => {
 
      const decoded = jwt.verify(token, process.env.JWT_RESET_SECRET)
      const results = await loginModel.findById(decoded.id)
-     if (!results) return res.status(404).json({ message: 'User not found' })
-     
+     if (!results) {
+      return res.status(404).json({ message: 'User not found' })
+     }
      // The password will be automatically hashed by the pre-save middleware in the model
      results.password = newPassword
      await results.save()
