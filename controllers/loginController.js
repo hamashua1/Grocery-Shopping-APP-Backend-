@@ -2,7 +2,7 @@ import loginModel from '../Models/login.js'
 import jwt from 'jsonwebtoken'
 import transporter from '../services/emailService.js'
 
-export const postLogin = async (req, res) => {
+export const postRegister = async (req, res) => {
     try {
         const { name, email, password } = req.body
 
