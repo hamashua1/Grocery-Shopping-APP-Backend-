@@ -18,7 +18,7 @@ export const postRegister = async (req, res) => {
 
         const existing = await loginModel.findOne({ email })
         if (existing) {
-            return res.status(409).json({ message: 'An account with this email already exists.' })
+            return res.status(409).json({ message: 'Registration failed. Please check your details.' })
         }
 
         const user = new loginModel({ name, email, password })

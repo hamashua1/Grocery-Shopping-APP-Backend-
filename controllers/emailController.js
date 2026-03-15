@@ -49,12 +49,11 @@ export const requestPasswordReset = async (req, res) => {
      }
 
      const results = await loginModel.findOne({ email })
-     if (!results) {
-      return res.status(404).json({ message: 'User not found with this email address' })
+     if (results) {
+       const token = jwt.sign({ id: results._id }, process.env.JWT_RESET_SECRET, { expiresIn: '1h' })
+       await sendResetEmail(email, token)
      }
-     const token = jwt.sign({ id: results._id }, process.env.JWT_RESET_SECRET, { expiresIn: '1h' })
-     await sendResetEmail(email, token)
-     res.status(200).json({ message: 'Password reset email sent successfully. Please check your inbox.' })
+     res.status(200).json({ message: 'If this email is registered, a reset link has been sent.' })
    } catch (err) {
      console.error('Password reset request error:', err)
      if (err.message === 'Failed to send password reset email') {
