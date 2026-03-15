@@ -54,7 +54,7 @@ app.get('/', (req, res) => {
         documentation: '/api-docs',
         endpoints: {
             authentication: ['/api/login/register', '/api/login/signIn', '/api/logout'],
-            passwordReset: ['/api/auth/request-reset', '/api/auth/reset-password/:token'],
+            passwordReset: ['/api/auth/request-reset', '/api/auth/reset-password'],
             items: ['/api/items', '/api/categories'],
             categories: ['/api/category/:name']
         }

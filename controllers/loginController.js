@@ -23,7 +23,7 @@ export const postRegister = async (req, res) => {
             return res.status(409).json({ message: 'Registration failed. Please check your details.' })
         }
 
-        const user = new loginModel({ name, email, password })
+        const user = new loginModel({ name: name.trim(), email, password })
         await user.save()
 
         res.status(201).json({ message: 'Account created successfully.', user: { id: user._id, name: user.name, email: user.email } })
