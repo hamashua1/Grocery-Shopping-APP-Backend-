@@ -14,7 +14,7 @@ export const postRegister = async (req, res) => {
         if (!emailRegex.test(email)) {
             return res.status(400).json({ message: 'Please provide a valid email address.' })
         }
-        if (password.length < 6) {
+        if (typeof password !== 'string' || password.length < 6) {
             return res.status(400).json({ message: 'Password must be at least 6 characters long.' })
         }
 
