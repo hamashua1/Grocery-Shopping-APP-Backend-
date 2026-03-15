@@ -80,6 +80,9 @@ jspm_packages/
 # DynamoDB Local files
 .dynamodb/
 
+# Claude Code project instructions (local only)
+CLAUDE.md
+
 # OS generated files
 .DS_Store
 .DS_Store?

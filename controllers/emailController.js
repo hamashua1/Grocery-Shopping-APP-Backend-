@@ -67,10 +67,11 @@ export const requestPasswordReset = async (req, res) => {
 }
 
 export const resetPassword = async (req, res) => {
-   const { token } = req.params
-   const { newPassword } = req.body
+   const { token, newPassword } = req.body
    try {
-     // Validate new password
+     if (!token) {
+       return res.status(400).json({ message: 'Reset token is required.' })
+     }
      if (!newPassword || newPassword.length < 6) {
        return res.status(400).json({ message: 'Password must be at least 6 characters long' })
      }

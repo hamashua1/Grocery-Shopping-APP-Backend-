@@ -8,7 +8,7 @@ export const postRegister = async (req, res) => {
         const { name, password } = req.body
         const email = req.body.email?.toLowerCase().trim()
 
-        if (!name || !email || !password) {
+        if (!name || !name.trim() || !email || !password) {
             return res.status(400).json({ message: 'Name, email, and password are required.' })
         }
         if (!emailRegex.test(email)) {
@@ -79,6 +79,10 @@ export const postSignIn = async (req, res) => {
 }
 
 export const postLogout = (_req, res) => {
-    res.clearCookie('token')
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
+    })
     res.status(200).json({ message: 'Logged out successfully.' })
 }

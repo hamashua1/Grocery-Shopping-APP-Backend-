@@ -5,19 +5,19 @@ const VALID_CATEGORIES = ['Fruits', 'Vegetables', 'Meat', 'Drinks']
 
 export const getItems = async (req, res) => {
     try {
+        const page = Math.max(1, parseInt(req.query.page) || 1)
         const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20))
+        const skip = (page - 1) * limit
         const filter = { userId: req.user.id }
 
-        const total = await itemModel.countDocuments(filter)
-        const pages = Math.ceil(total / limit) || 1
-        const page = Math.min(pages, Math.max(1, parseInt(req.query.page) || 1))
-        const skip = (page - 1) * limit
-
-        const items = await itemModel.find(filter).skip(skip).limit(limit)
+        const [items, total] = await Promise.all([
+            itemModel.find(filter).skip(skip).limit(limit),
+            itemModel.countDocuments(filter)
+        ])
 
         res.status(200).json({
             items,
-            pagination: { page, limit, total, pages }
+            pagination: { page, limit, total, pages: Math.ceil(total / limit) || 1 }
         })
     } catch (err) {
         console.error('Get items error:', err)
