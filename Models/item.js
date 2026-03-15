@@ -4,7 +4,7 @@ const itemSchema = new mongoose.Schema({
 name : {type : String , required :true},
 category : {type: String, required : true},
 completed : {type: Boolean, required: true},
-userId : {type: mongoose.Schema.Types.ObjectId, ref: 'login', required: true}
+userId : {type: mongoose.Schema.Types.ObjectId, ref: 'login', required: true, index: true}
 }, {
 timestamps: true  // This automatically adds createdAt and updatedAt fields
 })
