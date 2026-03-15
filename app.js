@@ -36,7 +36,10 @@ app.use('/api/login/register', authLimiter)
 app.use('/api/auth/request-reset', authLimiter)
 app.use('/api/auth/reset-password', authLimiter)
 
-connectDB().catch(console.error)
+connectDB().catch(err => {
+    console.error('Failed to connect to MongoDB:', err)
+    process.exit(1)
+})
 
 const swaggerDocument = YAML.load('./swagger.yaml')
 

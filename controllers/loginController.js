@@ -9,7 +9,8 @@ export const postRegister = async (req, res) => {
         if (!name || !email || !password) {
             return res.status(400).json({ message: 'Name, email, and password are required.' })
         }
-        if (!email.includes('@')) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(email)) {
             return res.status(400).json({ message: 'Please provide a valid email address.' })
         }
         if (password.length < 6) {
@@ -24,15 +25,15 @@ export const postRegister = async (req, res) => {
         const user = new loginModel({ name, email, password })
         await user.save()
 
+        res.status(201).json({ message: 'Account created successfully.', user: { id: user._id, name: user.name, email: user.email } })
+
         const mail = {
             from: process.env.SENDER_EMAIL,
             to: email,
             subject: 'Welcome to our Grocery Shopping App',
             text: `Welcome to our shopping app! You have successfully created an account with email: ${email}`
         }
-        await transporter.sendMail(mail)
-
-        res.status(201).json({ message: 'Account created successfully.', user: { id: user._id, name: user.name, email: user.email } })
+        transporter.sendMail(mail).catch(err => console.error('Welcome email failed:', err))
     } catch (err) {
         console.error('Registration error:', err)
         res.status(500).json({ message: 'Could not create account. Please try again.' })
@@ -72,7 +73,7 @@ export const postSignIn = async (req, res) => {
     }
 }
 
-export const postLogout = (req, res) => {
+export const postLogout = (_req, res) => {
     res.clearCookie('token')
     res.status(200).json({ message: 'Logged out successfully.' })
 }

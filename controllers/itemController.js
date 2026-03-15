@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import itemModel from '../Models/item.js'
 
 const VALID_CATEGORIES = ['Fruits', 'Vegetables', 'Meat', 'Drinks']
@@ -49,6 +50,9 @@ export const postItems = async (req, res) => {
 
 export const deleteItems = async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ message: 'Invalid item ID.' })
+        }
         const item = await itemModel.findOne({ _id: req.params.id, userId: req.user.id })
         if (!item) {
             return res.status(404).json({ message: 'Item not found.' })

@@ -44,7 +44,8 @@ export const requestPasswordReset = async (req, res) => {
    const { email } = req.body
    try {
      // Validate email format
-     if (!email || !email.includes('@')) {
+     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+     if (!email || !emailRegex.test(email)) {
        return res.status(400).json({ message: 'Please provide a valid email address' })
      }
 

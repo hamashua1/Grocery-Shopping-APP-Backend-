@@ -6,8 +6,8 @@ const router = express.Router()
 
 router.get('/api/items', authenticate, getItems)
 router.post('/api/items', authenticate, postItems)
-router.delete('/api/items/:id', authenticate, deleteItems)
 router.delete('/api/items/category/:name', authenticate, deleteCategory)
+router.delete('/api/items/:id', authenticate, deleteItems)
 router.get('/api/categories', authenticate, getCategory)
 router.get('/api/category/:name', authenticate, getCategoryItems)
 
