@@ -1,17 +1,14 @@
 import express from 'express'
-import { getItems, postItems, deleteItems, deleteCategory, getCategory, getFruits, getVegetables, getMeat, getDrinks } from '../../controllers/itemController.js'
+import { getItems, postItems, deleteItems, deleteCategory, getCategory, getCategoryItems } from '../../controllers/itemController.js'
+import authenticate from '../../middleware/auth.js'
+
 const router = express.Router()
 
-// router endpoints
-router.get('/api/items', getItems)
-router.post('/api/items', postItems)
-router.delete('/api/items/:id', deleteItems)
-router.delete('/api/items/category/:id', deleteCategory)
-router.get('/api/categories', getCategory)
-router.get('/api/category/Fruits', getFruits)
-router.get('/api/category/Vegetables', getVegetables)
-router.get('/api/category/Meat', getMeat)
-router.get('/api/category/Drinks', getDrinks)
+router.get('/api/items', authenticate, getItems)
+router.post('/api/items', authenticate, postItems)
+router.delete('/api/items/:id', authenticate, deleteItems)
+router.delete('/api/items/category/:name', authenticate, deleteCategory)
+router.get('/api/categories', authenticate, getCategory)
+router.get('/api/category/:name', authenticate, getCategoryItems)
 
 export default router
-
