@@ -83,6 +83,9 @@ jspm_packages/
 # Claude Code project instructions (local only)
 CLAUDE.md
 
+# Environment example file (may contain sensitive defaults)
+.env.example
+
 # OS generated files
 .DS_Store
 .DS_Store?
