@@ -2,6 +2,7 @@
 import loginModel from '../Models/login.js'
 import jwt from 'jsonwebtoken'
 import transporter from '../services/emailService.js'
+import { emailRegex } from '../utils/validators.js'
 
 // Function to send password reset email using nodemailer
 const sendResetEmail = async (email, token) => {
@@ -41,10 +42,9 @@ const sendResetEmail = async (email, token) => {
 }
 
 export const requestPasswordReset = async (req, res) => {
-   const { email } = req.body
+   const email = req.body.email?.toLowerCase().trim()
    try {
      // Validate email format
-     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
      if (!email || !emailRegex.test(email)) {
        return res.status(400).json({ message: 'Please provide a valid email address' })
      }

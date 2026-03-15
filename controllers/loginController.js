@@ -1,15 +1,16 @@
 import loginModel from '../Models/login.js'
 import jwt from 'jsonwebtoken'
 import transporter from '../services/emailService.js'
+import { emailRegex } from '../utils/validators.js'
 
 export const postRegister = async (req, res) => {
     try {
-        const { name, email, password } = req.body
+        const { name, password } = req.body
+        const email = req.body.email?.toLowerCase().trim()
 
         if (!name || !email || !password) {
             return res.status(400).json({ message: 'Name, email, and password are required.' })
         }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (!emailRegex.test(email)) {
             return res.status(400).json({ message: 'Please provide a valid email address.' })
         }
@@ -35,6 +36,9 @@ export const postRegister = async (req, res) => {
         }
         transporter.sendMail(mail).catch(err => console.error('Welcome email failed:', err))
     } catch (err) {
+        if (err.code === 11000) {
+            return res.status(409).json({ message: 'Registration failed. Please check your details.' })
+        }
         console.error('Registration error:', err)
         res.status(500).json({ message: 'Could not create account. Please try again.' })
     }
@@ -42,7 +46,8 @@ export const postRegister = async (req, res) => {
 
 export const postSignIn = async (req, res) => {
     try {
-        const { email, password } = req.body
+        const { password } = req.body
+        const email = req.body.email?.toLowerCase().trim()
 
         if (!email || !password) {
             return res.status(400).json({ message: 'Email and password are required.' })
