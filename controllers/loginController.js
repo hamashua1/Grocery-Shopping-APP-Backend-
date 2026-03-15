@@ -3,12 +3,19 @@ import jwt from 'jsonwebtoken'
 import transporter from '../services/emailService.js'
 import { emailRegex } from '../utils/validators.js'
 
+// Single source of truth for cookie flags — postSignIn and postLogout must stay in sync
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
+}
+
 export const postRegister = async (req, res) => {
     try {
         const { name, password } = req.body
         const email = req.body.email?.toLowerCase().trim()
 
-        if (!name || !name.trim() || !email || !password) {
+        if (!name || typeof name !== 'string' || !name.trim() || !email || !password) {
             return res.status(400).json({ message: 'Name, email, and password are required.' })
         }
         if (!emailRegex.test(email)) {
@@ -64,12 +71,7 @@ export const postSignIn = async (req, res) => {
         }
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' })
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-            maxAge: 60 * 60 * 1000
-        })
+        res.cookie('token', token, { ...cookieOptions, maxAge: 60 * 60 * 1000 })
 
         res.status(200).json({ message: 'Sign in successful.', user: { id: user._id, name: user.name, email: user.email } })
     } catch (err) {
@@ -79,10 +81,6 @@ export const postSignIn = async (req, res) => {
 }
 
 export const postLogout = (_req, res) => {
-    res.clearCookie('token', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
-    })
+    res.clearCookie('token', cookieOptions)
     res.status(200).json({ message: 'Logged out successfully.' })
 }

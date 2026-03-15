@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 import itemModel from '../Models/item.js'
 
 const VALID_CATEGORIES = ['Fruits', 'Vegetables', 'Meat', 'Drinks']
+const CATEGORY_ERROR = `Category must be one of: ${VALID_CATEGORIES.join(', ')}.`
 
 export const getItems = async (req, res) => {
     try {
@@ -33,7 +34,7 @@ export const postItems = async (req, res) => {
             return res.status(400).json({ message: 'Item name is required.' })
         }
         if (!category || !VALID_CATEGORIES.includes(category)) {
-            return res.status(400).json({ message: `Category must be one of: ${VALID_CATEGORIES.join(', ')}.` })
+            return res.status(400).json({ message: CATEGORY_ERROR })
         }
         if (completed === undefined || typeof completed !== 'boolean') {
             return res.status(400).json({ message: 'Completed must be a boolean.' })
@@ -53,11 +54,13 @@ export const deleteItems = async (req, res) => {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             return res.status(400).json({ message: 'Invalid item ID.' })
         }
-        const item = await itemModel.findOne({ _id: req.params.id, userId: req.user.id })
+
+        // findOneAndDelete is atomic — single round-trip vs findOne + deleteOne
+        const item = await itemModel.findOneAndDelete({ _id: req.params.id, userId: req.user.id })
         if (!item) {
             return res.status(404).json({ message: 'Item not found.' })
         }
-        await item.deleteOne()
+
         res.status(200).json({ message: 'Deleted successfully.', item })
     } catch (err) {
         console.error('Delete item error:', err)
@@ -69,7 +72,7 @@ export const deleteCategory = async (req, res) => {
     try {
         const { name } = req.params
         if (!VALID_CATEGORIES.includes(name)) {
-            return res.status(400).json({ message: `Category must be one of: ${VALID_CATEGORIES.join(', ')}.` })
+            return res.status(400).json({ message: CATEGORY_ERROR })
         }
         const result = await itemModel.deleteMany({ category: name, userId: req.user.id })
         res.status(200).json({ message: `Deleted ${result.deletedCount} item(s) from ${name}.` })
@@ -79,7 +82,7 @@ export const deleteCategory = async (req, res) => {
     }
 }
 
-export const getCategory = async (req, res) => {
+export const getCategories = async (req, res) => {
     try {
         const categories = await itemModel.distinct('category', { userId: req.user.id })
         res.status(200).json(categories)
@@ -93,7 +96,7 @@ export const getCategoryItems = async (req, res) => {
     try {
         const { name } = req.params
         if (!VALID_CATEGORIES.includes(name)) {
-            return res.status(400).json({ message: `Category must be one of: ${VALID_CATEGORIES.join(', ')}.` })
+            return res.status(400).json({ message: CATEGORY_ERROR })
         }
         const items = await itemModel.find({ category: name, userId: req.user.id })
         res.status(200).json(items)
