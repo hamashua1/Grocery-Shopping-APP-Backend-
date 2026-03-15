@@ -42,8 +42,9 @@ const sendResetEmail = async (email, token) => {
 }
 
 export const requestPasswordReset = async (req, res) => {
-   const email = req.body.email?.toLowerCase().trim()
    try {
+     const email = req.body.email?.toLowerCase().trim()
+
      // Validate email format
      if (!email || !emailRegex.test(email)) {
        return res.status(400).json({ message: 'Please provide a valid email address' })
