@@ -83,6 +83,9 @@ jspm_packages/
 # Claude Code project instructions (local only)
 CLAUDE.md
 
+# GitHub token file (local only — never commit)
+claude-code-open
+
 # Environment example file (may contain sensitive defaults)
 .env.example
 
