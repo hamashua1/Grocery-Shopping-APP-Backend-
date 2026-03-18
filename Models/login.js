@@ -4,7 +4,9 @@ import bcrypt from 'bcryptjs'
 const loginSchema = new mongoose.Schema({
 name : {type : String , required :true},
 email: {type: String, required : true, unique: true},
-password : {type: String, required: true}
+password : {type: String, required: true},
+passwordResetToken: { type: String },
+passwordResetExpires: { type: Date }
 }, { timestamps: true })
 
 // Add bcrypt pre-save middleware to automatically hash passwords

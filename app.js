@@ -36,6 +36,18 @@ app.use('/api/login/register', authLimiter)
 app.use('/api/auth/request-reset', authLimiter)
 app.use('/api/auth/reset-password', authLimiter)
 
+// CSRF protection: validate Origin header on state-changing requests in production
+app.use((req, res, next) => {
+    if (process.env.NODE_ENV !== 'production') return next()
+    if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next()
+    const origin = req.headers.origin
+    const allowed = process.env.FRONTEND_URL
+    if (!origin || origin !== allowed) {
+        return res.status(403).json({ message: 'Forbidden.' })
+    }
+    next()
+})
+
 connectDB().catch(err => {
     console.error('Failed to connect to MongoDB:', err)
     process.exit(1)

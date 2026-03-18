@@ -1,5 +1,5 @@
+import crypto from 'crypto'
 import loginModel from '../Models/login.js'
-import jwt from 'jsonwebtoken'
 import { sendResetEmail } from '../services/emailService.js'
 import { emailRegex } from '../utils/validators.js'
 
@@ -13,8 +13,14 @@ export const requestPasswordReset = async (req, res) => {
 
         const user = await loginModel.findOne({ email })
         if (user) {
-            const token = jwt.sign({ id: user._id }, process.env.JWT_RESET_SECRET, { expiresIn: '1h' })
-            await sendResetEmail(email, token)
+            const rawToken = crypto.randomBytes(32).toString('hex')
+            const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex')
+
+            user.passwordResetToken = hashedToken
+            user.passwordResetExpires = Date.now() + 60 * 60 * 1000 // 1 hour
+            await user.save()
+
+            await sendResetEmail(email, rawToken)
         }
 
         res.status(200).json({ message: 'If this email is registered, a reset link has been sent.' })
@@ -37,20 +43,24 @@ export const resetPassword = async (req, res) => {
             return res.status(400).json({ message: 'Password must be at least 6 characters long' })
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_RESET_SECRET)
-        const user = await loginModel.findById(decoded.id)
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex')
+        const user = await loginModel.findOne({
+            passwordResetToken: hashedToken,
+            passwordResetExpires: { $gt: Date.now() }
+        })
+
         if (!user) {
-            return res.status(404).json({ message: 'User not found' })
+            return res.status(400).json({ message: 'Invalid or expired reset token. Please request a new password reset.' })
         }
 
         user.password = newPassword
+        user.passwordResetToken = undefined
+        user.passwordResetExpires = undefined
         await user.save()
+
         res.status(200).json({ message: 'Password reset successfully. You can now login with your new password.' })
     } catch (err) {
         console.error('Password reset error:', err)
-        if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
-            return res.status(400).json({ message: 'Invalid or expired reset token. Please request a new password reset.' })
-        }
         res.status(500).json({ message: 'Server error. Please try again later.' })
     }
 }
